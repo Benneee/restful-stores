@@ -16,17 +16,15 @@ items = []
 
 class Item(Resource):
     def get(self, name):
-        for item in items:
-            if item['name'] == name:
-                return {"data": item}
-
-        return {
-            "message": 'Item not found!',
-            "data": None
-        }, 404
+        item = next(filter(lambda x: x['name'] == name, items), None) 
+        # "next" gives us the first item found by the filter function
+        return {"data": item}, 200 if item else 404
 
 
     def post(self, name):
+        if next(filter(lambda x: x['name'] == name, items), None) is not None:
+            return {"message": f"An item with {name} already exists."}, 400
+
         request_data = request.get_json()
         item = { 
                 "name": name,
