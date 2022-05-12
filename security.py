@@ -15,7 +15,7 @@ user_id_mapping = { u.id: u for u in users }
 # Authenticate Method
 def authenticate(username, password):
     user = username_mapping.get(username, None) # We can add a default value here because we are using the 'get' method
-    if user and safe_str_cmp(user.password) == password:
+    if user and safe_str_cmp(user.password, password):
         return user
 
     
