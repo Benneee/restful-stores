@@ -52,6 +52,19 @@ class Item(Resource):
         return { 'message': 'Item deleted' }
 
 
+    # It is expected that this method is idempotent
+    # i.e It must always do the same thing every time it is used.
+    def put(self, name):
+        request_data = request.get_json()
+        item = next(filter(lambda x: x['name'] == name, items), None)
+        if item is None:
+            item = {'name': name, 'price': request_data['price']}
+            items.append(item)
+        else:
+            item.update(request_data)
+        return item
+
+
 class ItemList(Resource):
     def get(self):
         return {"data": items}
