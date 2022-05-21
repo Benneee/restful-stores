@@ -26,6 +26,17 @@ class Item(Resource):
 
         if row:
             return {'item': { 'name': row[0], 'price': row[1] }}
+    
+    @classmethod
+    def insert_item(cls, item):
+        connection = sqlite3.connect('app.db')
+        cursor = connection.cursor()
+
+        create_query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(create_query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
 
     @jwt_required()
     def get(self, name):
@@ -45,14 +56,12 @@ class Item(Resource):
                 "name": name,
                 "price": request_data["price"]
         }
-        connection = sqlite3.connect('app.db')
-        cursor = connection.cursor()
 
-        create_query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(create_query, (item['name'], item['price']))
-
-        connection.commit()
-        connection.close()
+        try:
+            # Extracted the insertion logic
+            self.insert_item(item)
+        except:
+            return {"message": "An error occurred while inserting the item"}, 500 # Internal server error
 
         return {
             "message": "Item added",
