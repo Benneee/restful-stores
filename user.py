@@ -57,10 +57,15 @@ class UserRegister(Resource):
     )
 
     def post(self):
+        data = UserRegister.parser.parse_args()
+
+        user = User.find_by_username(data['username'])
+        if user:
+            return {'message': 'A user with that username already exists, pick another'}, 400
+
         connection = sqlite3.connect('app.db')
         cursor = connection.cursor()
 
-        data = UserRegister.parser.parse_args()
         # NULL for id since we know it auto-increments in the DB
         create_user_query = "INSERT INTO users VALUES (NULL, ?, ?)"
         cursor.execute(create_user_query, (data['username'], data['password'], ))
