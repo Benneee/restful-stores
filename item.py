@@ -13,8 +13,8 @@ class Item(Resource):
         help="This field cannot be left blank!"
     )
 
-    @jwt_required()
-    def get(self, name):
+    @classmethod
+    def find_by_name(cls, name):
         connection = sqlite3.connect('app.db')
         cursor = connection.cursor()
 
@@ -26,11 +26,17 @@ class Item(Resource):
 
         if row:
             return {'item': { 'name': row[0], 'price': row[1] }}
+
+    @jwt_required()
+    def get(self, name):
+        item = self.find_by_name(name)
+        if item:
+            return item
         return {"message": "Item not found"}, 404
 
 
     def post(self, name):
-        if next(filter(lambda x: x['name'] == name, items), None) is not None:
+        if self.find_by_name(name):
             return {"message": f"An item with {name} already exists."}, 400
 
         # request_data = request.get_json()
@@ -39,11 +45,19 @@ class Item(Resource):
                 "name": name,
                 "price": request_data["price"]
         }
-        items.append(item)
+        connection = sqlite3.connect('app.db')
+        cursor = connection.cursor()
+
+        create_query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(create_query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
+
         return {
             "message": "Item added",
             "data": item
-        }, 
+        }, 201
         
 
     def delete(self, name):
