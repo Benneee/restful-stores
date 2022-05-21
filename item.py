@@ -38,6 +38,17 @@ class Item(Resource):
         connection.commit()
         connection.close()
 
+    @classmethod
+    def update_item(cls, item):
+        connection = sqlite3.connect('app.db')
+        cursor = connection.cursor()
+
+        update_query = "UPDATE items SET price=? WHERE name=?"
+        cursor.execute(update_query, (item['price'], item['name'])) # The items in the tuple have to be in the order of their appearance in the query above
+
+        connection.commit()
+        connection.close()
+
     @jwt_required()
     def get(self, name):
         item = self.find_by_name(name)
@@ -85,23 +96,22 @@ class Item(Resource):
     # It is expected that this method is idempotent
     # i.e It must always do the same thing every time it is used.
     def put(self, name):
-        # request_data = request.get_json()
-
-        # Instead of using request.get_json(), we use the parser's 
-        # parse_args method which parses the request data and
-        # sends along the fields that match the arguments requirements
-        # above along with their value to request_data variable
-        # If we add any other field in the JSON payload, they will
-        # get erased and we won't see them in  request_data
         request_data = Item.parser.parse_args()
 
-        item = next(filter(lambda x: x['name'] == name, items), None)
+        item = self.find_by_name(name)
+        updated_item = {'name': name, 'price': request_data['price']}
+
         if item is None:
-            item = {'name': name, 'price': request_data['price']}
-            items.append(item)
+            try:
+                self.insert_item(updated_item)
+            except:
+                return {"message": "An error occurred while inserting the item"}, 500
         else:
-            item.update(request_data)
-        return item
+            try:
+                self.update_item(updated_item)
+            except:
+                return {"message": "An error occurred while updating the item"}, 500
+        return updated_item
 
 
 class ItemList(Resource):
