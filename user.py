@@ -1,4 +1,4 @@
-from multiprocessing import connection
+# Using this file for when we just needed to work with a DB for the first time
 import sqlite3
 
 class User:
