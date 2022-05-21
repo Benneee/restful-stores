@@ -1,4 +1,4 @@
-# Using this file for when we just needed to work with a DB for the first time
+from flask_restful import Resource, reqparse
 import sqlite3
 
 class User:
@@ -40,3 +40,32 @@ class User:
 
         connection.close()
         return user
+
+
+class UserRegister(Resource):
+    parser = reqparse.RequestParser()
+
+    parser.add_argument('username',
+        type=str,
+        required=True,
+        help="This field cannot be left blank!"
+    )
+    parser.add_argument('password',
+        type=str,
+        required=True,
+        help="This field cannot be left blank!"
+    )
+
+    def post(self):
+        connection = sqlite3.connect('app.db')
+        cursor = connection.cursor()
+
+        data = UserRegister.parser.parse_args()
+        # NULL for id since we know it auto-increments in the DB
+        create_user_query = "INSERT INTO users VALUES (NULL, ?, ?)"
+        cursor.execute(create_user_query, (data['username'], data['password'], ))
+        
+        connection.commit()
+        connection.close()
+
+        return {'message': 'User created successfully'}, 201
