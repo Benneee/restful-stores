@@ -1,6 +1,6 @@
 # This file will contain a few important functions
 from werkzeug.security import safe_str_cmp
-from user import User
+from resources.user import User
 
 # The mappings below gives us a way to easily find users and not have to iterate over the users list everytime
 users = [
