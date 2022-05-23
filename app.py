@@ -8,9 +8,9 @@ from resources.user import UserRegister
 from resources.item import Item, ItemList
 
 app = Flask(__name__)
-db.init_app(app)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///app.db"
+db.init_app(app)
 app.secret_key = 'benedict'
 api = Api(app)
 

@@ -32,7 +32,7 @@ class Item(Resource):
 
         try:
             # Extracted the insertion logic
-            item.insert_item()
+            item.save_item_to_db()
         except:
             return {"message": "An error occurred while inserting the item"}, 500 # Internal server error
 
@@ -43,14 +43,9 @@ class Item(Resource):
         
 
     def delete(self, name):
-        connection = sqlite3.connect('app.db')
-        cursor = connection.cursor()
-
-        delete_query = "DELETE FROM items WHERE name=?"
-        cursor.execute(delete_query, (name,))
-
-        connection.commit()
-        connection.close()
+        item = ItemModel.find_by_name(name)
+        if item:
+            item.delete_item()
 
         return {'message': 'Item deleted'}
 
@@ -61,19 +56,13 @@ class Item(Resource):
         request_data = Item.parser.parse_args()
 
         item = ItemModel.find_by_name(name)
-        updated_item = ItemModel(name, request_data['price'])
 
         if item is None:
-            try:
-                updated_item.insert_item()
-            except:
-                return {"message": "An error occurred while inserting the item"}, 500
+            item = ItemModel(name, request_data['price'])
         else:
-            try:
-                updated_item.update_item()
-            except:
-                return {"message": "An error occurred while updating the item"}, 500
-        return updated_item.json()
+            item.price = request_data['price']
+        item.save_item_to_db()
+        return item.json()
 
 
 class ItemList(Resource):

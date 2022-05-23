@@ -1,4 +1,3 @@
-import sqlite3
 from db import db
 
 
@@ -18,34 +17,12 @@ class ItemModel(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect('app.db')
-        cursor = connection.cursor()
-
-        get_query = "SELECT * FROM items WHERE name=?"
-        results = cursor.execute(get_query, (name,))
-        row = results.fetchone()
-
-        connection.close()
-
-        if row:
-            return cls(*row)
+        return cls.query.filter_by(name=name).first()
     
-    def insert_item(self):
-        connection = sqlite3.connect('app.db')
-        cursor = connection.cursor()
+    def save_item_to_db(self): # upsert
+        db.session.add(self)
+        db.session.commit()
 
-        create_query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(create_query, (self.name, self.price))
-
-        connection.commit()
-        connection.close()
-
-    def update_item(self):
-        connection = sqlite3.connect('app.db')
-        cursor = connection.cursor()
-
-        update_query = "UPDATE items SET price=? WHERE name=?"
-        cursor.execute(update_query, (self.name, self.price)) # The items in the tuple have to be in the order of their appearance in the query above
-
-        connection.commit()
-        connection.close()
+    def delete_item(self):
+        db.session.delete(self)
+        db.session.commit()
