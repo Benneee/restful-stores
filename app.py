@@ -1,12 +1,16 @@
 from flask_restful import Api
 from flask import Flask
 from flask_jwt import JWT
+from db import db
 
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.item import Item, ItemList
 
 app = Flask(__name__)
+db.init_app(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///app.db"
 app.secret_key = 'benedict'
 api = Api(app)
 
