@@ -3,14 +3,6 @@ from werkzeug.security import safe_str_cmp
 from models.user import UserModel
 
 # The mappings below gives us a way to easily find users and not have to iterate over the users list everytime
-users = [
-    UserModel(1, 'bob', 'asdf')
-]
-
-username_mapping = { u.username: u for u in users }
-
-user_id_mapping = { u.id: u for u in users }
-
 
 # Authenticate Method
 def authenticate(username, password):
