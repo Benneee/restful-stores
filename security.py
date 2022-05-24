@@ -15,5 +15,4 @@ def authenticate(username, password):
     
 def identity(payload):
     user_id  = payload['identity']
-    # return user_id_mapping.get(user_id, None)
     return UserModel.find_by_id(user_id)

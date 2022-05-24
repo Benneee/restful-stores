@@ -22,13 +22,6 @@ def create_tables():
 # JWT's addition here creates a new endpoint called "/auth" for the app
 jwt = JWT(app, authenticate, identity)
 
-# class Student(Resource):
-#     def get(self, name):
-#         return {'student': name}
-
-
-# api.add_resource(Student, '/student/<string:name>') # example URL: http://localhost:5000/student/benneee
-
 api.add_resource(Store, '/store/<string:name>')
 api.add_resource(Item, '/item/<string:name>') # example URL: http://localhost:5000/item/benneee
 api.add_resource(ItemList, '/items')
