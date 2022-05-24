@@ -12,6 +12,13 @@ class Item(Resource):
         help="This field cannot be left blank!"
     )
 
+    parser.add_argument('store_id',
+        type=int,
+        required=True,
+        help="Every item needs a store id"
+    )
+
+
     @jwt_required()
     def get(self, name):
         item = ItemModel.find_by_name(name)
@@ -26,7 +33,7 @@ class Item(Resource):
 
         # request_data = request.get_json()
         request_data = Item.parser.parse_args()
-        item = ItemModel(name, request_data['price'])
+        item = ItemModel(name, **request_data)
 
         try:
             # Extracted the insertion logic
@@ -56,7 +63,7 @@ class Item(Resource):
         item = ItemModel.find_by_name(name)
 
         if item is None:
-            item = ItemModel(name, request_data['price'])
+            item = ItemModel(name, **request_data)
         else:
             item.price = request_data['price']
         item.save_item_to_db()
