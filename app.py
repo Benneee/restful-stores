@@ -14,6 +14,9 @@ db.init_app(app)
 app.secret_key = 'benedict'
 api = Api(app)
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 # JWT's addition here creates a new endpoint called "/auth" for the app
 jwt = JWT(app, authenticate, identity)
