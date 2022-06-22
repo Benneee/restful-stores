@@ -16,3 +16,5 @@ six==1.16.0
 SQLAlchemy==1.4.36
 Werkzeug==2.0.0
 zipp==3.8.0
+gunicorn
+psycopg2-binary
